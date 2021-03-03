@@ -3,8 +3,8 @@ use std::env;
 #[derive(Default, Debug, Clone)]
 pub struct Config {
     pub log_level: String,
-    pub processor: String ,
-    pub batch_size: String,
+    pub processor: String , // TODO : enum
+    pub batch_size: String, // TODO : uint
     pub data_path: String,
 }
 

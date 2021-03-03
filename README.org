@@ -1,0 +1,8 @@
+
+
+* TODO Introductions
+* TODO install tensorflow
+* TODO generate tf model
+* TODO run predictions
+* TODO TODOs [0/1]
+- [ ] parallel pivot
