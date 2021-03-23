@@ -1,4 +1,5 @@
 mod config;
+mod utils;
 
 #[macro_use]
 extern crate quick_error;
@@ -16,6 +17,7 @@ use std::path::Path;
 use std::result::Result;
 use std::time::Instant;
 use tensorflow::{Graph, Session, SessionOptions, SessionRunArgs, Tensor, SavedModelBundle };
+// use utils::pause;
 
 quick_error! {
     #[derive(Debug)]
@@ -47,7 +49,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let data = read_csv (&config.data_path)?;
     let scores = calculate_scores (&data)?;
     // TODO: subsample during development
-    let scores = scores.head (Some (1000));
+    // let scores = scores.head (Some (1000));
 
     debug!("Head of the data:");
     debug!("{:#?}", &scores);
@@ -58,6 +60,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     debug!("Data in the long format:");
     debug!("{:?}", &scores);
+
+    // pause ();
 
     let tik = Instant::now();
     let tensor = df_to_tensor (&scores)?;
@@ -91,6 +95,7 @@ fn model_load () -> Result <(Graph, Session), tensorflow::Status> {
 
 fn model_predict (scores: &Tensor<f32>, user_index: &Tensor::<i32>, graph : &Graph, session : &Session)
                   -> Result <Tensor::<f32>, tensorflow::Status> {
+
     let mut args = SessionRunArgs::new();
     args.add_feed(&graph.operation_by_name_required("serving_default_scores").unwrap (), 0, &scores);
     args.add_feed(&graph.operation_by_name_required("serving_default_user_index").unwrap (), 0, &user_index);
@@ -174,9 +179,10 @@ fn df_to_tensor (df : &DataFrame)
     Tensor::new(&[nrow as u64, ncol as u64]).with_values(&values).map_err(DataFrameToTensorError::Status)
 }
 
-/// from columnar to long format
+/// from long (columnar) to wide (matrix) format
 fn pivot_data (data : &DataFrame) -> Result<(DataFrame, ChunkedArray<Utf8Type>, ChunkedArray<Utf8Type>), PolarsError> {
-    let scores = data.groupby("user_slash_id")?
+    let scores = data
+        .groupby("user_slash_id")?
         .pivot("video_slash_id", "video_slash_scores")
         .first()?;
     let video_ids = scores.get_column_names ().into_iter().skip(1).collect::<ChunkedArray<Utf8Type>>();
