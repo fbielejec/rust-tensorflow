@@ -1,8 +1,44 @@
-
+#+TITLE:       rust-tensorflow
+#+SUBTITLE:    run TF models with Rust
+#+AUTHOR:      Filip Bielejec
+#+EMAIL:       (concat "fbielejec" at-sign "gmail.com")
 
 * TODO Introductions
-* TODO install tensorflow
-* TODO generate tf model
-* TODO run predictions
+* DONE install tensorflow
+Install shared Tensorflow libraries:
+
+#+BEGIN_SRC bash
+curl -sL https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-2.3.0.tar.gz -o libtensorflow.tar.xz
+mkdir libtensorflow && tar -xf libtensorflow.tar.xz -C libtensorflow
+mv libtensorflow/lib/libtensorflow.so.2.3.0 /usr/local/lib/
+mv libtensorflow/lib/libtensorflow.so.2 /usr/local/lib/
+mv libtensorflow/lib/libtensorflow.so /usr/local/lib/
+mv libtensorflow/lib/libtensorflow_framework.so.2.3.0 /usr/local/lib/
+mv libtensorflow/lib/libtensorflow_framework.so.2 /usr/local/lib/
+mv libtensorflow/lib/libtensorflow_framework.so /usr/local/lib/
+sudo ldconfig
+#+EMAIL
+
+* DONE generate TF model
+Install python package:
+
+#+BEGIN_SRC bash
+pip install tensorflow
+#+END_SRC
+
+Generate the model:
+
+#+BEGIN_SRC bash
+python model.ppy
+#+END_SRC
+
+* DONE run predictions
+Build the binary and run it:
+
+#+BEGIN_SRC bash
+cargo build --release
+./target/release/recsys
+#+END_SRC
+
 * TODO TODOs [0/1]
 - [ ] parallel pivot
